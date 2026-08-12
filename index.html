@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond The Classroom - Oxford International School</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* BASE & RESET */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #e8e5de;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Lato', sans-serif;
+            padding: 20px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* CONTROLS */
+        .controls {
+            background: #ffffff;
+            padding: 12px 24px;
+            border-radius: 40px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 16px;
+            margin-bottom: 40px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            border: 1px solid #D4AF37;
+        }
+        .controls button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1A3B32;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .controls button:hover { background: #f4f1ea; }
+        .controls .btn-primary { background: #1A3B32; color: #FDFBF7; }
+        .controls .btn-primary:hover { background: #2b5548; }
+        .controls .separator { width: 1px; background: #e0dcd5; margin: 0 4px; }
+
+        /* PAGE CONTAINER */
+        .page-container {
+            transform-origin: top center;
+            transition: transform 0.2s ease;
+        }
+
+        /* A4 PAGE SPECIFICATION */
+        .magazine-page {
+            width: 210mm;
+            height: 297mm;
+            background: #FDFBF7;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            page-break-after: always;
+            break-after: page;
+            margin: 20px auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 20mm 22mm;
+        }
+
+        /* DECORATIVE SYSTEM */
+        .dec-corner {
+            position: absolute;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .dec-corner.tl { top: 0; left: 0; }
+        .dec-corner.br { bottom: 0; right: 0; transform: rotate(180deg); }
+        .dec-corner-svg { display: block; width: 160px; height: 160px; }
+        
+        .dec-leaf {
+            position: absolute;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .dec-leaf.tl-leaf { top: 30px; right: 30px; }
+        .dec-leaf.br-leaf { bottom: 30px; left: 30px; transform: rotate(180deg); }
+        .dec-leaf-svg { width: 60px; height: 60px; }
+
+        .dec-dots {
+            position: absolute;
+            z-index: 2;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .dec-dots.left { top: 50%; left: 12px; transform: translateY(-50%); }
+        .dec-dots.right { top: 50%; right: 12px; transform: translateY(-50%); }
+        .dot { width: 4px; height: 4px; background: #D4AF37; border-radius: 50%; }
+
+        /* GOLD BORDER */
+        .page-border {
+            position: absolute;
+            top: 18mm; left: 18mm; right: 18mm; bottom: 18mm;
+            border: 1px solid #D4AF37;
+            pointer-events: none;
+            z-index: 3;
+        }
+        .page-border-inner {
+            position: absolute;
+            top: 20mm; left: 20mm; right: 20mm; bottom: 20mm;
+            border: 1px solid #D4AF37;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* PAGE CONTENT WRAPPER */
+        .page-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* PAGE NUMBERS */
+        .page-number {
+            position: absolute;
+            bottom: 15mm;
+            right: 22mm;
+            font-family: 'Playfair Display', serif;
+            font-size: 0.8rem;
+            color: #D4AF37;
+            z-index: 10;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        /* TYPOGRAPHY */
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: #1A3B32; }
+        h1 { font-size: 3.5rem; font-weight: 700; letter-spacing: -1px; }
+        h2 { font-size: 2.8rem; font-weight: 700; }
+        h3 { font-size: 1.6rem; font-weight: 400; font-style: italic; color: #D4AF37; }
+        h4 { font-size: 1.2rem; font-weight: 700; }
+        p { font-family: 'Lato', sans-serif; font-weight: 300; font-size: 0.9rem; line-height: 1.6; color: #2b3d37; }
+
+        /* --- PAGE SPECIFIC --- */
+
+        /* PAGE 1: COVER */
+        .cover-page { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30mm 20mm; }
+        .cover-logo { max-width: 120px; margin-bottom: 24px; }
+        .cover-school { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #1A3B32; letter-spacing: 4px; }
+        .cover-location { font-family: 'Lato', sans-serif; font-size: 0.9rem; color: #D4AF37; letter-spacing: 6px; text-transform: uppercase; margin-top: 4px; }
+        .cover-title { font-size: 5rem; line-height: 1; margin-top: 30px; color: #1A3B32; }
+        .cover-subtitle { font-size: 1.6rem; font-weight: 300; font-style: italic; color: #D4AF37; margin-top: 16px; }
+        .cover-themes { font-family: 'Lato', sans-serif; font-size: 0.8rem; color: #1A3B32; letter-spacing: 3px; margin-top: 30px; border-top: 1px solid #D4AF37; border-bottom: 1px solid #D4AF37; padding: 12px 24px; }
+        .cover-credit { font-family: 'Lato', sans-serif; font-size: 0.7rem; color: #7c8a84; margin-top: 40px; }
+        .cover-motto { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; color: #D4AF37; margin-top: 30px; }
+
+        /* PAGE 2: VISION */
+        .vision-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .vision-title { margin-bottom: 16px; }
+        .vision-text { max-width: 80%; margin-bottom: 32px; }
+        .vision-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; border-top: 2px solid #D4AF37; padding-top: 20px; }
+        .vision-item { padding: 12px; background: rgba(26, 59, 50, 0.03); border-left: 2px solid #D4AF37; }
+        .vision-item h4 { color: #1A3B32; margin-bottom: 4px; }
+        .vision-item p { font-size: 0.8rem; }
+        .vision-path { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid #e0dcd5; border-bottom: 1px solid #e0dcd5; }
+        .vision-path span { font-family: 'Lato', sans-serif; font-size: 0.7rem; font-weight: 700; color: #D4AF37; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* PAGE 3: INDEX */
+        .index-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .index-title { margin-bottom: 40px; }
+        .index-list { width: 80%; list-style: none; }
+        .index-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.3); font-family: 'Lato', sans-serif; font-size: 1rem; color: #1A3B32; }
+        .index-item:first-child { border-top: 1px solid rgba(212, 175, 55, 0.3); }
+        .index-dot { font-family: 'Playfair Display', serif; color: #D4AF37; letter-spacing: 4px; }
+        .index-page { color: #D4AF37; font-weight: 700; }
+
+        /* PAGE 4: TIMELINE */
+        .timeline-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .timeline-title { margin-bottom: 30px; }
+        .timeline-container { display: flex; justify-content: space-between; position: relative; padding-top: 20px; }
+        .timeline-line { position: absolute; top: 30px; left: 0; right: 0; height: 2px; background: #D4AF37; z-index: 1; }
+        .timeline-item { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; width: 10%; text-align: center; }
+        .timeline-dot { width: 12px; height: 12px; background: #D4AF37; border: 2px solid #FDFBF7; border-radius: 50%; box-shadow: 0 0 0 2px #D4AF37; margin-bottom: 10px; }
+        .timeline-class { font-family: 'Playfair Display', serif; font-size: 0.7rem; font-weight: 700; color: #1A3B32; }
+        .timeline-desc { font-family: 'Lato', sans-serif; font-size: 0.6rem; color: #2b3d37; margin-top: 4px; line-height: 1.2; }
+
+        /* PAGE 5-14: CLASS PAGES */
+        .class-header { margin-bottom: 16px; border-bottom: 2px solid #D4AF37; padding-bottom: 12px; }
+        .class-number { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #D4AF37; letter-spacing: 4px; }
+        .class-title { font-size: 2.2rem; color: #b7954b; margin-top: -4px; }
+        .class-desc { font-size: 0.85rem; font-style: italic; color: #5e706a; }
+
+        .curriculum-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: 1; align-content: start; }
+        
+        .month-group { background: rgba(26, 59, 50, 0.02); border: 1px solid rgba(212, 175, 55, 0.2); padding: 8px; }
+        .month-group-header { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; color: #1A3B32; text-align: center; border-bottom: 1px solid #D4AF37; padding-bottom: 4px; margin-bottom: 8px; }
+        
+        .cat-block { margin-bottom: 8px; }
+        .cat-block:last-child { margin-bottom: 0; }
+        .cat-label { font-family: 'Lato', sans-serif; font-size: 0.65rem; font-weight: 700; color: #D4AF37; text-transform: uppercase; letter-spacing: 1px; display: block; }
+        .cat-content { font-family: 'Lato', sans-serif; font-size: 0.65rem; line-height: 1.3; color: #1A3B32; }
+        .cat-content.project { font-weight: 700; color: #1A3B32; }
+
+        /* PAGE 15: CLOSING */
+        .closing-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .closing-title { font-size: 4rem; }
+        .closing-quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.8rem; color: #D4AF37; margin: 40px 0; max-width: 80%; }
+        .closing-logo { max-width: 120px; margin-top: 40px; }
+        .closing-school { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #1A3B32; letter-spacing: 2px; margin-top: 20px; }
+        .closing-sub { font-family: 'Lato', sans-serif; font-size: 0.9rem; color: #D4AF37; letter-spacing: 4px; text-transform: uppercase; }
+        .closing-motto { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; color: #1A3B32; margin-top: 20px; }
+        .closing-credit { font-family: 'Lato', sans-serif; font-size: 0.7rem; color: #7c8a84; margin-top: 30px; }
+
+        /* PRINT STYLES */
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .controls { display: none !important; }
+            .magazine-page {
+                margin: 0; padding: 20mm 22mm; width: 100%; height: 100vh; 
+                box-shadow: none; border: none; page-break-after: always; break-after: page;
+            }
+            .page-container { transform: none !important; }
+            .cover-page { padding: 30mm 20mm; }
+            .page-border, .page-border-inner { border-color: #D4AF37; }
+            .dec-corner-svg { display: block; }
+            .dot { background: #D4AF37; }
+        }
+
+        /* RESPONSIVENESS */
+        @media screen and (max-width: 900px) {
+            .magazine-page { transform: scale(0.8); margin: -20px auto; }
+            body { padding: 10px; }
+        }
+        @media screen and (max-width: 700px) {
+            .magazine-page { transform: scale(0.6); margin: -50px auto; }
+            .controls { padding: 8px 16px; gap: 8px; flex-wrap: wrap; justify-content: center; }
+            .controls button { font-size: 0.7rem; padding: 4px 8px; }
+            .cover-title { font-size: 3rem; }
+            .vision-grid { grid-template-columns: 1fr; }
+            .curriculum-grid { grid-template-columns: 1fr 1fr; }
+            .timeline-container { flex-wrap: wrap; justify-content: center; }
+            .timeline-item { width: 20%; margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CONTROLS -->
+    <nav class="controls" id="controls">
+        <button class="btn-primary" onclick="window.print()">SAVE AS PDF</button>
+        <div class="separator"></div>
+        <button onclick="toggleFullscreen()">FULLSCREEN</button>
+        <div class="separator"></div>
+        <button onclick="zoomOut()">ZOOM −</button>
+        <button onclick="resetZoom()">RESET</button>
+        <button onclick="zoomIn()">ZOOM +</button>
+    </nav>
+
+    <!-- MAGAZINE PAGES WRAPPER -->
+    <div class="page-container" id="page-container" style="transform: scale(1);">
+        <!-- Pages will be rendered by JavaScript -->
+    </div>
+
+    <script>
+        // ============================================================
+        // 1. CURRICULUM DATA MODEL (SINGLE SOURCE OF TRUTH)
+        // ============================================================
+        // Transcription accuracy note: All 280 entries are preserved exactly.
+        const curriculum = {
+            class3: {
+                title: "Learning to Think", 
+                desc: "Building the foundational blocks of logic and reasoning.",
+                months: {
+                    august: {
+                        prescribed: "Pattern Recognition in Everyday Life",
+                        addon: "Tangram Pattern Challenge",
+                        weekly: "Find the Missing Pattern",
+                        project: "Pattern Discovery Scrapbook"
+                    },
+                    september: {
+                        prescribed: "Sequences and Logical Ordering",
+                        addon: "Sequence Card Games",
+                        weekly: "Complete the Sequence",
+                        project: "Shape Sequence Game"
+                    },
+                    october: {
+                        prescribed: "Decomposition – Breaking Big Tasks into Smaller Steps",
+                        addon: "Daily Routine Breakdown Chart",
+                        weekly: "Break a Task into Simple Steps",
+                        project: "My Daily Routine Storyboard"
+                    },
+                    november: {
+                        prescribed: "Algorithmic Thinking – Step-by-Step Problem Solving",
+                        addon: "Classroom Navigation Challenge",
+                        weekly: "Give Step-by-Step Directions",
+                        project: "Treasure Hunt Map"
+                    },
+                    december: {
+                        prescribed: "Spatial Awareness and Direction",
+                        addon: "Build 3D Models with Blocks",
+                        weekly: "Identify Objects from Different Views",
+                        project: "3D Shape Model"
+                    },
+                    january: {
+                        prescribed: "Symmetry and Shape Transformations",
+                        addon: "Origami Symmetry Activities",
+                        weekly: "Complete the Mirror Image",
+                        project: "Symmetry Art Portfolio"
+                    },
+                    february: {
+                        prescribed: "CT Portfolio & Competency Assessment",
+                        addon: "CT Quiz Competition",
+                        weekly: "Logic Puzzle Challenge",
+                        project: "CT Learning Portfolio"
+                    }
+                }
+            },
+            class4: {
+                title: "Learning to Reason", 
+                desc: "Developing logic, classification, and multi-step thinking.",
+                months: {
+                    august: {
+                        prescribed: "Multi-step Pattern Recognition",
+                        addon: "Secret Pattern Messages",
+                        weekly: "Decipher a hidden code based on structural pattern scales.",
+                        project: "Cipher Code Booklet Creation"
+                    },
+                    september: {
+                        prescribed: "Sorting and Classification",
+                        addon: "Sorting Objects Activity",
+                        weekly: "Group items into a precise overlapping multi-set Venn diagram.",
+                        project: "Multi-criteria Sorting Matrix Directory"
+                    },
+                    october: {
+                        prescribed: "Breaking Problems into Smaller Parts",
+                        addon: "Role-play Problem Solving",
+                        weekly: "Isolate the bottleneck constraint in a multi-step recipe card.",
+                        project: "Layered System Process Map Presentation"
+                    },
+                    november: {
+                        prescribed: "Decision Making",
+                        addon: "Unplugged board game design centered on conditional paths.",
+                        weekly: "Trace output values through a paper-based conditional pathway.",
+                        project: "Conditional Path Unplugged Board Game"
+                    },
+                    december: {
+                        prescribed: "Shape Transformations",
+                        addon: "Designing shadow silhouette projections using varied light angles.",
+                        weekly: "Predict the appearance of an object after a compound 90-degree flip.",
+                        project: "3D Perspective Silhouette Design Kit"
+                    },
+                    january: {
+                        prescribed: "Finding the Best Solution",
+                        addon: "Shortest Route Challenge",
+                        weekly: "Find the optimal pathway through a multi-weight node web.",
+                        project: "School Playground Shortest Path Mapping Guide"
+                    },
+                    february: {
+                        prescribed: "CT Portfolio Assessment",
+                        addon: "Gamified competitive logic tournament brackets.",
+                        weekly: "Execute error correction on a broken directional instructions map.",
+                        project: "Computational Optimization Project Portfolio"
+                    }
+                }
+            },
+            class5: {
+                title: "Learning to Solve", 
+                desc: "Analyzing complex systems and optimizing routes and data.",
+                months: {
+                    august: {
+                        prescribed: "Advanced Pattern Recognition",
+                        addon: "Creating visual puzzle books with variable numerical rules.",
+                        weekly: "Solve a multi-variable progressive sequence array riddle.",
+                        project: "Global Logical Progression Compendium"
+                    },
+                    september: {
+                        prescribed: "Collecting and Organizing Data",
+                        addon: "Hands-on Data Sorting",
+                        weekly: "Filter out outliers from a raw categorical information set.",
+                        project: "Categorical Information Directory System"
+                    },
+                    october: {
+                        prescribed: "Breaking Down Complex Systems",
+                        addon: "Mind Maps",
+                        weekly: "Build a breakdown matrix for a smart city public transport node.",
+                        project: "Urban Infrastructure Structural Decomposition Chart"
+                    },
+                    november: {
+                        prescribed: "Multi-step Decision Making",
+                        addon: "Designing text-based choose-your-own-path adventure plots.",
+                        weekly: "Trace parameters through a multi-tier nested choice hierarchy.",
+                        project: "Interactive Narrative Choice Tree Blueprint"
+                    },
+                    december: {
+                        prescribed: "Maps and Spatial Reasoning",
+                        addon: "Different Views of Objects",
+                        weekly: "Sketch the top, front, and side views of an complex block setup.",
+                        project: "Multi-View Engineering Design Portfolio"
+                    },
+                    january: {
+                        prescribed: "Efficient Route Planning",
+                        addon: "Delivery Route Game",
+                        weekly: "Determine the absolute minimal spanning tree for a grid network.",
+                        project: "Logistics Delivery Route Optimization Plan"
+                    },
+                    february: {
+                        prescribed: "CT Competency Assessment",
+                        addon: "Unplugged logical framework final group capstone presentations.",
+                        weekly: "Identify the faulty logic step in a compound routing sequence.",
+                        project: "Preparatory Stage Comprehensive Capstone File"
+                    }
+                }
+            },
+            class6: {
+                title: "From Logic to Intelligence", 
+                desc: "Introduction to AI, automation, data, and ethics.",
+                months: {
+                    august: {
+                        prescribed: "Computational Thinking in Everyday Life",
+                        addon: "Scratch block programming tasks translating physical flowcharts.",
+                        weekly: "Debug an explicit loop structure inside a visual text flowchart.",
+                        project: "Algorithmic Process Flowchart Portfolio"
+                    },
+                    september: {
+                        prescribed: "Automation vs AI: Differentiating automated fixed systems from data learning engines. Focus: Smart tech.",
+                        addon: "Building clear distinction flowcharts comparing automation and learning systems.",
+                        weekly: "Classify ten household tech items as either automated or AI.",
+                        project: "Automation vs AI Classification Manual"
+                    },
+                    october: {
+                        prescribed: "How AI Learns",
+                        addon: "Interactive modeling using Google Teachable Machine interfaces.",
+                        weekly: "Map specific application examples to the correct ML core variant.",
+                        project: "Interactive Image Classifier Training Model"
+                    },
+                    november: {
+                        prescribed: "Introduction to Data",
+                        addon: "Creating structured data collection logs for personal routines.",
+                        weekly: "Identify and fix data type mismatches in a mock database table.",
+                        project: "Personal Activity Structured Data Directory"
+                    },
+                    december: {
+                        prescribed: "AI Around Us",
+                        addon: "Anatomical mapping of daily recommender app feeds.",
+                        weekly: "Trace the predictive input features used by search engines.",
+                        project: "Recommender System Functional Analysis Map"
+                    },
+                    january: {
+                        prescribed: "Responsible AI & Ethics",
+                        addon: "Analyzing case scenarios of non-representative training datasets.",
+                        weekly: "Highlight potential data gaps in a localized survey sample.",
+                        project: "Data Diversity Equity Audit Handbook"
+                    },
+                    february: {
+                        prescribed: "CT & AI Competency Assessment",
+                        addon: "Cross-subject project review linking computational thinking to natural sciences.",
+                        weekly: "Re-engineer an inefficient sorting workflow for optimal execution.",
+                        project: "Integrated Scientific Data Analysis Dashboard"
+                    }
+                }
+            },
+            class7: {
+                title: "Understanding Machine Learning", 
+                desc: "Exploring optimization, classification, clustering, and bias.",
+                months: {
+                    august: {
+                        prescribed: "Routing Optimization: Algorithmic processes for shortest distance loops. Focus: Network efficiency.",
+                        addon: "Graph network problem tasks analyzing campus traffic flows.",
+                        weekly: "Determine the shortest delivery route using Dijkstra algorithm rules.",
+                        project: "Campus Logistics Path Optimization Model"
+                    },
+                    september: {
+                        prescribed: "Core AI Domains: Comprehensive mapping of Data Science, CV, and NLP frameworks. Focus: Domain tracking.",
+                        addon: "Building physical interactive games mapping computer vision tracking.",
+                        weekly: "Identify the core AI domains active within a modern smart car.",
+                        project: "Multi-Domain AI Functional Application Proposal"
+                    },
+                    october: {
+                        prescribed: "Predictive Modeling: Linear regression and trend estimation parameters. Focus: Trend analysis.",
+                        addon: "Plotting scatter charts manually to locate lines of best fit.",
+                        weekly: "Calculate simple linear residuals from a given trend coordinate.",
+                        project: "Manual Predictive Trend Estimation Analysis"
+                    },
+                    november: {
+                        prescribed: "Classification Techniques: Sorting data inputs into distinct target boundaries. Focus: Grouping rules.",
+                        addon: "Designing manual decision boundaries on custom graph coordinate sets.",
+                        weekly: "Draw the optimal separating line between two coordinate clusters.",
+                        project: "Binary Classification Decision Boundary Model"
+                    },
+                    december: {
+                        prescribed: "Clustering Methods: Identifying organic groupings without labels. Focus: Unsupervised grouping.",
+                        addon: "K-Means physical simulation tasks using colored tokens on grid layouts.",
+                        weekly: "Locate the geometric center of a spatial point cluster manually.",
+                        project: "Spatial Data Clustering System Simulation"
+                    },
+                    january: {
+                        prescribed: "Algorithmic Bias: Sourcing errors in data collection pipelines. Focus: Data balance.",
+                        addon: "Analyzing historical datasets for systemic algorithmic omissions.",
+                        weekly: "Identify sampling bias vectors in a school population poll.",
+                        project: "Algorithmic Pipeline Bias Evaluation Report"
+                    },
+                    february: {
+                        prescribed: "Technical Competency Review: Evaluating domain analysis capabilities. Focus: Analytical skill.",
+                        addon: "Interactive domain design ideation sessions tackling community concerns.",
+                        weekly: "Optimize a multi-stop regional distribution grid system.",
+                        project: "Community Solutions Engineering Blueprint Portfolio"
+                    }
+                }
+            },
+            class8: {
+                title: "AI Problem Solving", 
+                desc: "Scoping problems, acquiring data, and evaluating models ethically.",
+                months: {
+                    august: {
+                        prescribed: "Resource Allocation Logic: Scheduling under complex shared constraints. Focus: Operations.",
+                        addon: "Simulating corporate operations schedules using constraint tables.",
+                        weekly: "Resolve a resource bottleneck in a multi-variable project track.",
+                        project: "Constraint-Based Resource Scheduling System"
+                    },
+                    september: {
+                        prescribed: "Problem Scoping: Defining precise target statements using 4Ws frameworks. Focus: Initialization.",
+                        addon: "Aligning problem scoping frameworks directly with Sustainable Development Goals (SDGs).",
+                        weekly: "Draft a complete 4Ws problem definition statement for an issue.",
+                        project: "SDG-Aligned AI Problem Scoping Framework"
+                    },
+                    october: {
+                        prescribed: "Data Acquisition & Exploration: Sourcing, parsing, and cleaning raw inputs. Focus: Data preparation.",
+                        addon: "Parsing open-source public csv data catalogs using visual tools.",
+                        weekly: "Isolate structural data errors in an uncurated spreadsheet matrix.",
+                        project: "Public Dataset Cleaning & Sourcing Portfolio"
+                    },
+                    november: {
+                        prescribed: "Modeling Frameworks: Structural differences between rule and learning models. Focus: Model logic.",
+                        addon: "Interactive walkthroughs comparing rule systems vs neural architectures.",
+                        weekly: "Determine whether a problem suits traditional rules or ML approaches.",
+                        project: "Rule-Based vs Learning-Based System Comparison"
+                    },
+                    december: {
+                        prescribed: "Evaluation Metrics: Measuring performance accuracy vs random outcomes. Focus: Performance validation.",
+                        addon: "Building confusion matrices for real-world classifier test outputs.",
+                        weekly: "Calculate true positive and false positive rates from test data.",
+                        project: "AI Classifier Model Evaluation Report"
+                    },
+                    january: {
+                        prescribed: "Data Privacy & Security: Consent structures, footprint trails, and digital safety. Focus: Ethics framework.",
+                        addon: "Drafting personal digital privacy charters for online activity profiles.",
+                        weekly: "Map the data trail generated during a single internet search.",
+                        project: "Personal Digital Privacy & Safety Protocol Charter"
+                    },
+                    february: {
+                        prescribed: "Middle Stage Capstone Check: Complete synthesis of the 100-hour learning path. Focus: Stage readiness.",
+                        addon: "Cross-stage peer mentorship leads and prototype presentation runs.",
+                        weekly: "Synthesize complete project specifications under rigid constraints.",
+                        project: "Comprehensive Middle Stage Technical Capstone File"
+                    }
+                }
+            },
+            class9: {
+                title: "The Coding Begins", 
+                desc: "Python fundamentals, statistics, probability, and the AI lifecycle.",
+                months: {
+                    august: {
+                        prescribed: "AI Project Lifecycle Overview: Deep dive into the five iterative stages. Focus: Product lifecycle.",
+                        addon: "Design thinking workshops applied directly to system engineering lifecycles.",
+                        weekly: "Map a localized problem to all 5 stages of the AI lifecycle.",
+                        project: "Iterative Technical Project Lifecycle Blueprint"
+                    },
+                    september: {
+                        prescribed: "Sustainable Development Goals (SDGs): Aligning tech solutions to global challenges. Focus: Strategic impact.",
+                        addon: "Developing collaborative software specs targeting localized environmental goals.",
+                        weekly: "Select the optimal SDG focus area for a community waste issue.",
+                        project: "SDG-Aligned System Specification Documentation"
+                    },
+                    october: {
+                        prescribed: "Data Literacy Pipelines: Sourcing strategies, reliability checking, data integrity. Focus: Input quality.",
+                        addon: "Managing basic files using simple local workspace organizational trees.",
+                        weekly: "Verify the integrity of a dataset by locating missing elements.",
+                        project: "Data Integrity Verification & Cleaning Portfolio"
+                    },
+                    november: {
+                        prescribed: "Introduction to Python Syntax: Text coding, variables, input/output structures. Focus: Coding syntax.",
+                        addon: "Building custom command-line text calculators using Python scripts.",
+                        weekly: "Write a Python script that calculates simple interest with user inputs.",
+                        project: "Interactive Command-Line Python Application"
+                    },
+                    december: {
+                        prescribed: "Mathematical Grounding for AI: Core statistical metrics and averages. Focus: Analytics foundation.",
+                        addon: "Calculating variance and standard deviation manually from real datasets.",
+                        weekly: "Compute the mean, median, and mode for a skewed dataset array.",
+                        project: "Descriptive Statistics Analytical Report"
+                    },
+                    january: {
+                        prescribed: "Probability Distributions: Basic probability rules applied to data frequency. Focus: Certainty metrics.",
+                        addon: "Simulating probability outcomes for data missingness indicators.",
+                        weekly: "Calculate the empirical probability of error from a system log.",
+                        project: "Probability Distribution Modeling Project"
+                    },
+                    february: {
+                        prescribed: "CBSE Skill Subject 417 Setup: Lab file curation and baseline reviews. Focus: Curriculum alignment.",
+                        addon: "Conducting collaborative code reviews and group debugging workshops.",
+                        weekly: "Identify and fix syntax bugs in a provided broken Python block.",
+                        project: "Official CBSE Skill Subject 417 Laboratory File"
+                    }
+                }
+            },
+            class10: {
+                title: "Building with Data", 
+                desc: "Advanced Python, data visualization, and model evaluation metrics.",
+                months: {
+                    august: {
+                        prescribed: "Advanced Python Fundamentals: Conditional loops, structured lists, dictionary maps. Focus: Data structures.",
+                        addon: "Implementing list comprehensions and complex dictionary parsing code.",
+                        weekly: "Write a Python loop to extract specific keys from a dictionary array.",
+                        project: "Structured Python Data Manipulation Utility"
+                    },
+                    september: {
+                        prescribed: "Data Collection & Sourcing: Sourcing open-source data portals securely. Focus: Sourcing pipelines.",
+                        addon: "Automating manual data gathering processes using custom local file feeds.",
+                        weekly: "Acquire and validate a dataset from an official open data registry.",
+                        project: "Validated Open-Data Extraction Archive"
+                    },
+                    october: {
+                        prescribed: "Data Visualization Techniques: Building line, bar, scatter, and box plots. Focus: Clear communication.",
+                        addon: "Building interactive data storytelling portfolios using data layouts.",
+                        weekly: "Select the best graph type to highlight data variance anomalies.",
+                        project: "Interactive Data Storytelling Visualization Dashboard"
+                    },
+                    november: {
+                        prescribed: "Model Evaluation Frameworks: Precision, Recall, and F1-Score metrics. Focus: Quality parameters.",
+                        addon: "Deriving performance metrics mathematically from raw operational counts.",
+                        weekly: "Calculate the Precision score from an asymmetric evaluation table.",
+                        project: "Advanced Classification Performance Evaluation Report"
+                    },
+                    december: {
+                        prescribed: "Confusion Matrix Analysis: Evaluating prediction errors systematically. Focus: Error tracking.",
+                        addon: "Constructing comprehensive confusion matrix charts for multi-class tests.",
+                        weekly: "Populate a 2x2 confusion matrix based on a text performance log.",
+                        project: "Multi-Class Confusion Matrix Analysis Document"
+                    },
+                    january: {
+                        prescribed: "Overfitting vs Underfitting: Identifying model generalization failures. Focus: Model balance.",
+                        addon: "Tuning system parameters manually to witness performance variations.",
+                        weekly: "Diagnose whether a model is underfitting based on error graphs.",
+                        project: "Model Optimization & Parameter Adjustment Logs"
+                    },
+                    february: {
+                        prescribed: "CBSE Board Practical Readiness: Reviewing file items and exam dry runs. Focus: Exam tracking.",
+                        addon: "Time-bound coding assessments mirroring national tech evaluation tasks.",
+                        weekly: "Complete a standard board practical program within a strict timeline.",
+                        project: "Official CBSE Board Skill Subject 417 Practical File"
+                    }
+                }
+            },
+            class11: {
+                title: "Engineering the Data", 
+                desc: "OOP, NumPy, Pandas, preprocessing, and foundational ML algorithms.",
+                months: {
+                    august: {
+                        prescribed: "Advanced Python & OOPs Concepts: Classes, objects, inheritance structures. Focus: Software architecture.",
+                        addon: "Designing clean reusable object modules for technical system builds.",
+                        weekly: "Construct a Python class that accurately models a database entity record.",
+                        project: "Object-Oriented Python Software Asset"
+                    },
+                    september: {
+                        prescribed: "Data Engineering Foundations: Vectorized calculations using NumPy arrays. Focus: High-speed arrays.",
+                        addon: "Optimizing array computational runtimes over standard iterative loops.",
+                        weekly: "Perform a complex matrix dot-product step using pure NumPy syntax.",
+                        project: "High-Performance NumPy Computational Library"
+                    },
+                    october: {
+                        prescribed: "Data Transformation with Pandas: Series, DataFrames, structural slicing. Focus: Data wrangling.",
+                        addon: "Manipulating multi-layered indexing schemas inside complex tables.",
+                        weekly: "Filter a Pandas DataFrame using multiple compound conditional criteria.",
+                        project: "Pandas DataFrame Structural Manipulation Portfolio"
+                    },
+                    november: {
+                        prescribed: "Data Preprocessing Pipelines: Handling missing parameters and bad records. Focus: Data cleanup.",
+                        addon: "Building custom categorical converters without automated library calls.",
+                        weekly: "Impute missing value holes using calculated group mean values.",
+                        project: "End-to-End Data Preprocessing Engineering Pipeline"
+                    },
+                    december: {
+                        prescribed: "Machine Learning Algorithms: Foundational mechanics of linear regression. Focus: Supervised models.",
+                        addon: "Deriving ordinary least squares parameter states through calculations.",
+                        weekly: "Calculate the exact Mean Squared Error value for a regression line.",
+                        project: "Predictive Linear Regression Numerical Model"
+                    },
+                    january: {
+                        prescribed: "Classification Tasks: Logistic regression systems and clear decision criteria. Focus: Boundaries.",
+                        addon: "Plotting logistic sigmoid activation vectors on numeric grids.",
+                        weekly: "Determine the log-odds ratio given a set of binary classification counts.",
+                        project: "Binary Logistic Regression Classification System"
+                    },
+                    february: {
+                        prescribed: "CBSE Skill Subject 843 Integration: Structural setup of portfolios and files. Focus: Advanced track.",
+                        addon: "Setting up clean version control protocols across local development folders.",
+                        weekly: "Initialize a clean version-controlled workspace repository structure.",
+                        project: "Official CBSE Skill Subject 843 Practical Portfolio"
+                    }
+                }
+            },
+            class12: {
+                title: "From Learner to AI Builder", 
+                desc: "Neural networks, NLP, deployment, and professional application.",
+                months: {
+                    august: {
+                        prescribed: "Advanced Data Pipelines: Feature selection methodologies and scale fixes. Focus: Feature tuning.",
+                        addon: "Deploying automatic feature variance filtering pipelines on dirty data.",
+                        weekly: "Select the top features from a high-dimension data group matrix.",
+                        project: "Automated Feature Engineering & Scaling Pipeline"
+                    },
+                    september: {
+                        prescribed: "Advanced Data Pipelines: Feature selection methodologies and scale fixes. Focus: Feature tuning.",
+                        addon: "Building custom coordinate cluster step visualizations.",
+                        weekly: "Trace the centroid movements of a basic 2D K-Means setup manually.",
+                        project: "Visual K-Means Data Segmentation System"
+                    },
+                    october: {
+                        prescribed: "Introduction to Neural Networks: Perceptrons, weights, biases, layers. Focus: Deep learning deep dive.",
+                        addon: "Simulating forward propagation loops manually using basic array logic.",
+                        weekly: "Calculate the net input value of a node given weights and biases.",
+                        project: "Functional Single-Layer Perceptron Simulation Tool"
+                    },
+                    november: {
+                        prescribed: "Natural Language Processing: Text cleaning, tokenization, stop-word cuts. Focus: NLP pipelines.",
+                        addon: "Building custom regular expression text tokenizers from baseline rules.",
+                        weekly: "Write an expression to purge text blocks of HTML syntax debris.",
+                        project: "Comprehensive Text Cleansing & Tokenization Engine"
+                    },
+                    december: {
+                        prescribed: "Linguistics & Computing: Syntax tree structures and semantic models. Focus: Language rules.",
+                        addon: "Parsing sentence parts using formal grammatical syntax mapping tools.",
+                        weekly: "Draw a syntax parse tree for a compound functional sentence block.",
+                        project: "Linguistic Syntax Parsing & Semantics Analyzer"
+                    },
+                    january: {
+                        prescribed: "Model Deployment Strategies: Operational testing and version tracking. Focus: Production logic.",
+                        addon: "Packaging finished code models into local programmatic microservices.",
+                        weekly: "Expose a locally saved prediction function through a code gateway.",
+                        project: "Deployable Local Predictive Microservice Application"
+                    },
+                    february: {
+                        prescribed: "CBSE Board Final Preparation: Project evaluation runs and mock practical checks. Focus: Board ready.",
+                        addon: "Participating in bootcamps, hackathons, and professional industry pathways.",
+                        weekly: "Review and optimize a classmate's production script layout.",
+                        project: "Official CBSE Skill Subject 843 Capstone Board Portfolio"
+                    }
+                }
+            }
+        };
+
+        // ============================================================
+        // 2. VALIDATION SYSTEM
+        // ============================================================
+        function validateCurriculum(data) {
+            const expectedClasses = [3,4,5,6,7,8,9,10,11,12];
+            const expectedMonths = ['august','september','october','november','december','january','february'];
+            const expectedCategories = ['prescribed','addon','weekly','project'];
+            let errors = [];
+
+            for (let i = 0; i < expectedClasses.length; i++) {
+                const cls = expectedClasses[i];
+                const key = 'class' + cls;
+                if (!data[key]) { errors.push(`Missing class ${cls}`); continue; }
+                
+                for (let j = 0; j < expectedMonths.length; j++) {
+                    const month = expectedMonths[j];
+                    if (!data[key].months[month]) { errors.push(`Class ${cls} missing month ${month}`); continue; }
+
+                    for (let k = 0; k < expectedCategories.length; k++) {
+                        const cat = expectedCategories[k];
+                        if (!data[key].months[month].hasOwnProperty(cat)) { 
+                            errors.push(`Class ${cls}, ${month} missing category ${cat}`); 
+                        } else if (data[key].months[month][cat].trim() === '') {
+                            errors.push(`Class ${cls}, ${month}, ${cat} is empty`);
+                        }
+                    }
+                }
+            }
+
+            if (errors.length === 0) {
+                console.log('✅ CURRICULUM VALIDATION PASSED');
+                console.log(`✅ ${expectedClasses.length} classes, ${expectedMonths.length} months, ${expectedCategories.length} categories verified. Total entries: ${expectedClasses.length * expectedMonths.length * expectedCategories.length}`);
+            } else {
+                console.error('❌ CURRICULUM VALIDATION FAILED');
+                errors.forEach(err => console.error(err));
+            }
+        }
+
+        // ============================================================
+        // 3. RENDER ENGINE
+        // ============================================================
+        function renderMagazine() {
+            const container = document.getElementById('page-container');
+            let html = '';
+
+            // DECORATIVE ELEMENTS
+            const cornerSVG = `
+                <svg class="dec-corner-svg" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0 L160 0 L160 20 Q160 140 140 160 L0 160 Z" fill="#1A3B32"/>
+                    <path d="M0 0 L160 0 L160 10 Q160 150 150 160 L0 160 Z" fill="none" stroke="#D4AF37" stroke-width="2"/>
+                </svg>`;
+            
+            const leafSVG = `
+                <svg class="dec-leaf-svg" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M30 5 Q50 25 30 50 Q10 25 30 5" stroke="#1A3B32" stroke-width="2" fill="none" opacity="0.4"/>
+                    <path d="M30 5 Q35 15 35 20" stroke="#1A3B32" stroke-width="1.5" fill="none" opacity="0.4"/>
+                    <path d="M30 15 Q40 25 40 30" stroke="#1A3B32" stroke-width="1.5" fill="none" opacity="0.4"/>
+                    <path d="M30 25 Q35 30 35 35" stroke="#1A3B32" stroke-width="1.5" fill="none" opacity="0.4"/>
+                    <path d="M30 35 Q40 45 40 50" stroke="#1A3B32" stroke-width="1.5" fill="none" opacity="0.4"/>
+                </svg>`;
+
+            // PAGE 1: COVER
+            html += `
+            <div class="magazine-page cover-page">
+                <div class="dec-corner tl">${cornerSVG}</div>
+                <div class="dec-corner br">${cornerSVG}</div>
+                <div class="dec-leaf br-leaf">${leafSVG}</div>
+                <div class="dec-leaf tl-leaf">${leafSVG}</div>
+                <div class="page-border"></div>
+                <div class="page-border-inner"></div>
+                <div class="page-content">
+                    <div style="margin-bottom: 30px;"><img src="assets/school-logo.png" alt="Oxford International School Logo" class="cover-logo" onerror="this.style.display='none'"></div>
+                    <div class="cover-school">OXFORD INTERNATIONAL SCHOOL</div>
+                    <div class="cover-location">GAJRAULA</div>
+                    <h1 class="cover-title">BEYOND<br>THE CLASSROOM</h1>
+                    <div class="cover-subtitle">The Future-Ready Learning Journey</div>
+                    <div class="cover-themes">ARTIFICIAL INTELLIGENCE • COMPUTATIONAL THINKING • INNOVATION</div>
+                    <div class="cover-credit">Created by the School's Advisory Committee</div>
+                    <div class="cover-motto">NURTURING THE FUTURE</div>
+                </div>
+            </div>`;
+
+            // PAGE 2: VISION
+            html += `
+            <div class="magazine-page">
+                <div class="dec-corner tl">${cornerSVG}</div>
+                <div class="dec-corner br">${cornerSVG}</div>
+                <div class="dec-leaf br-leaf">${leafSVG}</div>
+                <div class="dec-leaf tl-leaf">${leafSVG}</div>
+                <div class="page-border"></div>
+                <div class="page-border-inner"></div>
+                <div class="page-content vision-content">
+                    <h2 class="vision-title">A NEW WAY OF LEARNING</h2>
+                    <p class="vision-text">At Oxford International School, Gajraula, we go beyond the classroom to prepare our students for a world where logic, data, creativity and technology increasingly shape the way we learn, work and solve problems.</p>
+                    <div class="vision-grid">
+                        <div class="vision-item"><h4>COMPUTATIONAL THINKING</h4><p>Breaking complex problems into logical, manageable systems.</p></div>
+                        <div class="vision-item"><h4>ARTIFICIAL INTELLIGENCE</h4><p>Understanding how machines learn from data, identify patterns and make predictions.</p></div>
+                        <div class="vision-item"><h4>INNOVATION</h4><p>Turning ideas into meaningful solutions for real-world problems.</p></div>
+                    </div>
+                    <div class="vision-path">
+                        <span>FOUNDATION</span> → <span>EXPLORATION</span> → <span>CODING</span> → <span>DATA</span> → <span>MACHINE LEARNING</span> → <span>AI SYSTEMS</span> → <span>DEPLOYMENT</span>
+                    </div>
+                </div>
+                <div class="page-number">02</div>
+            </div>`;
+
+            // PAGE 3: INDEX
+            const indexItems = [
+                { title: "A New Way of Learning", page: "02" },
+                { title: "The 10-Year Learning Journey", page: "04" },
+                { title: "Class 3 — Learning to Think", page: "05" },
+                { title: "Class 4 — Learning to Reason", page: "06" },
+                { title: "Class 5 — Learning to Solve", page: "07" },
+                { title: "Class 6 — From Logic to Intelligence", page: "08" },
+                { title: "Class 7 — Understanding Machine Learning", page: "09" },
+                { title: "Class 8 — AI Problem Solving", page: "10" },
+                { title: "Class 9 — The Coding Begins", page: "11" },
+                { title: "Class 10 — Building with Data", page: "12" },
+                { title: "Class 11 — Engineering the Data", page: "13" },
+                { title: "Class 12 — From Learner to AI Builder", page: "14" },
+                { title: "The Journey Continues", page: "15" }
+            ];
+            let indexHTML = indexItems.map(item => 
+                `<li class="index-item"><span>${item.title}</span><span class="index-dot">. . . . . . . . . . . . </span><span class="index-page">${item.page}</span></li>`
+            ).join('');
+            html += `
+            <div class="magazine-page">
+                <div class="dec-corner tl">${cornerSVG}</div>
+                <div class="dec-corner br">${cornerSVG}</div>
+                <div class="dec-leaf br-leaf">${leafSVG}</div>
+                <div class="dec-leaf tl-leaf">${leafSVG}</div>
+                <div class="page-border"></div>
+                <div class="page-border-inner"></div>
+                <div class="page-content index-content">
+                    <h2 class="index-title">CONTENTS</h2>
+                    <ul class="index-list">${indexHTML}</ul>
+                </div>
+                <div class="page-number">03</div>
+            </div>`;
+
+            // PAGE 4: TIMELINE
+            const timelineData = [
+                { cls: "CLASS III", desc: "Pattern Recognition" },
+                { cls: "CLASS IV", desc: "Decision Making" },
+                { cls: "CLASS V", desc: "Data & Optimization" },
+                { cls: "CLASS VI", desc: "AI Foundations" },
+                { cls: "CLASS VII", desc: "Machine Learning Concepts" },
+                { cls: "CLASS VIII", desc: "AI Problem Solving" },
+                { cls: "CLASS IX", desc: "Python + AI Lifecycle" },
+                { cls: "CLASS X", desc: "Data + Model Evaluation" },
+                { cls: "CLASS XI", desc: "Data Engineering + Machine Learning" },
+                { cls: "CLASS XII", desc: "Neural Networks + NLP + Deployment" }
+            ];
+            let timelineHTML = timelineData.map(item => 
+                `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-class">${item.cls}</div><div class="timeline-desc">${item.desc}</div></div>`
+            ).join('');
+            html += `
+            <div class="magazine-page">
+                <div class="dec-corner tl">${cornerSVG}</div>
+                <div class="dec-corner br">${cornerSVG}</div>
+                <div class="dec-leaf br-leaf">${leafSVG}</div>
+                <div class="dec-leaf tl-leaf">${leafSVG}</div>
+                <div class="page-border"></div>
+                <div class="page-border-inner"></div>
+                <div class="page-content timeline-content">
+                    <h2 class="timeline-title">THE 10-YEAR LEARNING JOURNEY</h2>
+                    <div class="timeline-container">
+                        <div class="timeline-line"></div>
+                        ${timelineHTML}
+                    </div>
+                </div>
+                <div class="page-number">04</div>
+            </div>`;
+
+            // PAGE 5-14: CLASS PAGES
+            const classKeys = ['class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'class10', 'class11', 'class12'];
+            const monthGroups = [
+                ['august', 'september'],
+                ['october', 'november'],
+                ['december', 'january'],
+                ['february']
+            ];
+            const pageStartNum = 5;
+
+            classKeys.forEach((key, index) => {
+                const clsData = curriculum[key];
+                const classNum = key.replace('class', '');
+                const pageNum = pageStartNum + index;
+                
+                let gridHTML = '';
+                monthGroups.forEach(group => {
+                    let monthText = group.map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(' / ');
+                    let blocksHTML = '';
+                    group.forEach(monthKey => {
+                        const m = clsData.months[monthKey];
+                        if(!m) return;
+                        blocksHTML += `
+                            <div class="cat-block">
+                                <span class="cat-label">PRESCRIBED</span>
+                                <div class="cat-content">${m.prescribed}</div>
+                            </div>
+                            <div class="cat-block">
+                                <span class="cat-label">SMART ADD-ON</span>
+                                <div class="cat-content">${m.addon}</div>
+                            </div>
+                            <div class="cat-block">
+                                <span class="cat-label">WEEKLY CHALLENGE</span>
+                                <div class="cat-content">${m.weekly}</div>
+                            </div>
+                            <div class="cat-block">
+                                <span class="cat-label">MONTHLY PROJECT</span>
+                                <div class="cat-content project">${m.project}</div>
+                            </div>
+                        `;
+                    });
+                    gridHTML += `
+                        <div class="month-group">
+                            <div class="month-group-header">${monthText}</div>
+                            ${blocksHTML}
+                        </div>
+                    `;
+                });
+
+                html += `
+                <div class="magazine-page">
+                    <div class="dec-corner tl">${cornerSVG}</div>
+                    <div class="dec-corner br">${cornerSVG}</div>
+                    <div class="dec-leaf br-leaf">${leafSVG}</div>
+                    <div class="dec-leaf tl-leaf">${leafSVG}</div>
+                    <div class="page-border"></div>
+                    <div class="page-border-inner"></div>
+                    <div class="page-content">
+                        <div class="class-header">
+                            <div class="class-number">CLASS ${classNum}</div>
+                            <h2 class="class-title">${clsData.title}</h2>
+                            <div class="class-desc">${clsData.desc}</div>
+                        </div>
+                        <div class="curriculum-grid">
+                            ${gridHTML}
+                        </div>
+                    </div>
+                    <div class="page-number">${String(pageNum).padStart(2, '0')}</div>
+                </div>`;
+            });
+
+            // PAGE 15: CLOSING
+            html += `
+            <div class="magazine-page">
+                <div class="dec-corner tl">${cornerSVG}</div>
+                <div class="dec-corner br">${cornerSVG}</div>
+                <div class="dec-leaf br-leaf">${leafSVG}</div>
+                <div class="dec-leaf tl-leaf">${leafSVG}</div>
+                <div class="page-border"></div>
+                <div class="page-border-inner"></div>
+                <div class="page-content closing-content">
+                    <h2 class="closing-title">THE JOURNEY<br>CONTINUES</h2>
+                    <div class="closing-quote">"From asking 'How does it work?'<br>to asking 'How can I build it better?'"</div>
+                    <div><img src="assets/school-logo.png" alt="Oxford International School Logo" class="closing-logo" onerror="this.style.display='none'"></div>
+                    <div class="closing-school">OXFORD INTERNATIONAL SCHOOL</div>
+                    <div class="closing-sub">GAJRAULA</div>
+                    <div class="closing-motto">BEYOND THE CLASSROOM • NURTURING THE FUTURE</div>
+                    <div class="closing-credit">Created by the School's Advisory Committee</div>
+                </div>
+                <div class="page-number">15</div>
+            </div>`;
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // 4. INTERACTIVE CONTROLS
+        // ============================================================
+        let currentScale = 1;
+        function zoomIn() { currentScale = Math.min(currentScale + 0.1, 2); updateZoom(); }
+        function zoomOut() { currentScale = Math.max(currentScale - 0.1, 0.5); updateZoom(); }
+        function resetZoom() { currentScale = 1; updateZoom(); }
+        function updateZoom() {
+            document.getElementById('page-container').style.transform = `scale(${currentScale})`;
+        }
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // ============================================================
+        // 5. BOOT SEQUENCE
+        // ============================================================
+        window.onload = function() {
+            validateCurriculum(curriculum);
+            renderMagazine();
+            console.log('✅ Magazine rendering complete.');
+            console.log('✅ Open in Chrome > Print > Save as PDF for the perfect A4 output.');
+        };
+    </script>
+</body>
+</html>
